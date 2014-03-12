@@ -172,12 +172,6 @@ Elemento.prototype.toModule = function () {
   return ejs.render(tpl, this);
 };
 
-var getElementNode = function () {
-  if (document.currentScript) {
-    return document.currentScript.parentNode;
-  }
-};
-
 var parse = function (content) {
   var element = new Elemento();
   var elementAttrRE = /<element([^>]*)>/;

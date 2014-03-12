@@ -1,12 +1,13 @@
 {
-  "name": "ce",
-  "version": "0.0.0",
-  "description": "custom_element ==============",
+  "name": "elemento",
+  "version": "0.0.1",
+  "description": "elemento / Web Component",
   "main": "index,js",
   "bin": {
-    "ce": "bin/build"
+    "elemento": "bin/build"
   },
   "dependencies": {
+    "ejs": "~0.8.5",
     "esprima": "~1.0.4",
     "escodegen": "~1.3.0"
   },
@@ -16,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/JacksonTian/custom_element.git"
+    "url": "git://github.com/JacksonTian/elemento.git"
   },
   "keywords": [
     "custom",
@@ -25,7 +26,7 @@
   "author": "Jackson Tian",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JacksonTian/custom_element/issues"
+    "url": "https://github.com/JacksonTian/elemento/issues"
   },
-  "homepage": "https://github.com/JacksonTian/custom_element"
+  "homepage": "https://github.com/JacksonTian/elemento"
 }
