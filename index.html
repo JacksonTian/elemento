@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script type="text/javascript" src="tick-tock-clock.js"></script>
+</head>
+<body>
+  <div id="container"></div>
+  <script type="text/javascript">
+    var root = document.createElement('tick-tock-clock');
+    var container = document.getElementById('container');
+    container.appendChild(root);
+    var component = window['tick-tock-clock'].create(root);
+    component.parentElement = container;
+    component.readyCallback();
+  </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var path = require('path');
+var ejs = require('ejs');
+var esprima = require('esprima');
+var escodegen = require('escodegen');
+
+var content = fs.readFileSync(path.join(__dirname, '../element.elt'), 'utf8');
+
+var tpl = fs.readFileSync(path.join(__dirname, 'template.tpl'), 'utf8');
+var Elemento = function () {
+  this.name = '';
+};
+
+Elemento.prototype.complie = function () {
+  // var create = function (){};
+  var wrapAst = {
+    "type": "VariableDeclaration",
+    "declarations": [
+      {
+        "type": "VariableDeclarator",
+        "id": {
+          "type": "Identifier",
+          "name": "create"
+        },
+        "init": {
+          "type": "FunctionExpression",
+          "id": null,
+          "params": [
+            {
+              "type": "Identifier",
+              "name": "root"
+            }
+          ],
+          "defaults": [],
+          "body": {
+            "type": "BlockStatement",
+            "body": []
+          },
+          "rest": null,
+          "generator": false,
+          "expression": false
+        }
+      }
+    ],
+    "kind": "var"
+  };
+
+  var rootAst = {
+    "type": "Property",
+    "key": {
+      "type": "Identifier",
+      "name": "root"
+    },
+    "value": {
+      "type": "Identifier",
+      "name": "root"
+    },
+    "kind": "init"
+  };
+  var templateAst = {
+    "type": "Property",
+    "key": {
+      "type": "Identifier",
+      "name": "template"
+    },
+    "value": {
+      "type": "CallExpression",
+      "callee": {
+        "type": "FunctionExpression",
+        "id": null,
+        "params": [],
+        "defaults": [],
+        "body": {
+          "type": "BlockStatement",
+          "body": [
+            {
+              "type": "VariableDeclaration",
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "id": {
+                    "type": "Identifier",
+                    "name": "tpl"
+                  },
+                  "init": {
+                    "type": "CallExpression",
+                    "callee": {
+                      "type": "MemberExpression",
+                      "computed": false,
+                      "object": {
+                        "type": "Identifier",
+                        "name": "document"
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "name": "createElement"
+                      }
+                    },
+                    "arguments": [
+                      {
+                        "type": "Literal",
+                        "value": "template"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "kind": "var"
+            },
+            {
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                  "type": "MemberExpression",
+                  "computed": false,
+                  "object": {
+                    "type": "Identifier",
+                    "name": "tpl"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "innerHTML"
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": this.template
+                }
+              }
+            },
+            {
+              "type": "ReturnStatement",
+              "argument": {
+                "type": "Identifier",
+                "name": "tpl"
+              }
+            }
+          ]
+        },
+        "rest": null,
+        "generator": false,
+        "expression": false
+      },
+      "arguments": []
+    },
+    "kind": "init"
+  };
+
+  var ast = esprima.parse(this.script);
+  // console.log(JSON.stringify(ast, null, 2));
+  var last = ast.body[ast.body.length - 1];
+  // 添加template在属性中
+  last.expression.properties.unshift(templateAst);
+  last.expression.properties.unshift(rootAst);
+  // console.log(JSON.stringify(last, null, 2));
+  // 添加return
+  var replaced = {
+    "type": "ReturnStatement",
+    "argument": last.expression
+  };
+  ast.body[ast.body.length - 1] = replaced;
+  wrapAst.declarations[0].init.body.body = ast.body;
+  this.code = escodegen.generate(wrapAst, {format: {indent: {style: '  ', base: 1}}});
+};
+
+Elemento.prototype.toModule = function () {
+  this.complie();
+  return ejs.render(tpl, this);
+};
+
+var getElementNode = function () {
+  if (document.currentScript) {
+    return document.currentScript.parentNode;
+  }
+};
+
+var parse = function (content) {
+  var element = new Elemento();
+  var elementAttrRE = /<element([^>]*)>/;
+  var matched = content.match(elementAttrRE);
+  var attrs = matched[1].trim();
+  matched = attrs.match(/name="([^"]*)"/);
+  element.name = matched[1];
+  var templateRE = /<template>([\s\S]+)<\/template>/;
+  element.template = content.match(templateRE)[1].trim();
+  var scriptRE = /<script>([\s\S]+)<\/script>/;
+  element.script = content.match(scriptRE)[1].trim();
+  // console.log(element);
+  return element;
+};
+
+var element = parse(content);
+
+fs.writeFileSync(path.join(__dirname, '../' + element.name + '.js'), element.toModule());
