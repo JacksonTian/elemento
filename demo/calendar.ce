@@ -1,0 +1,19 @@
+<element name="calendar">
+  <template>
+    <div id="content"></div>
+  </template>
+  <script>
+  ({
+    readyCallback: function () {
+      this.root.innerHTML = this.template.innerHTML;
+      var root = this.root;
+      root.addEventListener("mouseover", function () {
+        root.querySelector('#content').innerHTML = 'mouseover';
+      });
+      root.addEventListener("mouseout", function () {
+        root.querySelector('#content').innerHTML = 'mouseout';
+      });
+    }
+  });
+  </script>
+</element>

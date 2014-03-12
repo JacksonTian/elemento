@@ -6,8 +6,6 @@ var ejs = require('ejs');
 var esprima = require('esprima');
 var escodegen = require('escodegen');
 
-var content = fs.readFileSync(path.join(__dirname, '../element.elt'), 'utf8');
-
 var tpl = fs.readFileSync(path.join(__dirname, 'template.tpl'), 'utf8');
 var Elemento = function () {
   this.name = '';
@@ -187,6 +185,12 @@ var parse = function (content) {
   return element;
 };
 
-var element = parse(content);
+var argv = process.argv;
+var input = argv[2];
+if (!input) {
+  process.exit(1);
+}
 
+var content = fs.readFileSync(input, 'utf8');
+var element = parse(content);
 fs.writeFileSync(path.join(__dirname, '../' + element.name + '.js'), element.toModule());
