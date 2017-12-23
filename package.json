@@ -7,7 +7,7 @@
     "elemento": "bin/build"
   },
   "dependencies": {
-    "ejs": "~0.8.5",
+    "ejs": "^2.5.7",
     "esprima": "~1.0.4",
     "escodegen": "~1.3.0"
   },
